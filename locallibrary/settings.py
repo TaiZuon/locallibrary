@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'catalog.apps.CatalogConfig', 
+
+    'django_seed', # Django Seed for seeding data
 ]
 
 MIDDLEWARE = [
