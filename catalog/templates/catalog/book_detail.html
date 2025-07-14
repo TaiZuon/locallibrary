@@ -1,0 +1,35 @@
+{% extends "base_generic.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h1>{% trans "Title" %}: {{ book.title }}</h1>
+
+    <p><strong>{% trans "Author" %}:</strong> <a href="">{{ book.author }}</a></p>
+    <p><strong>{% trans "Summary" %}:</strong> {{ book.summary }}</p>
+    <p><strong>{% trans "ISBN" %}:</strong> {{ book.isbn }}</p>
+    <p><strong>{% trans "Language" %}:</strong> {{ book.language }}</p>
+    <p><strong>{% trans "Genre" %}:</strong> {{ book.genre.all|join:", " }}</p>
+
+    <div class="book-detail-copies"></div>
+        <h4>{% trans "Copies" %}</h4>
+        {% for copy in book_instances %}
+            <hr>
+            <p class="
+            {% if copy.status == LoanStatus.AVAILABLE.value %}
+                text-success
+            {% elif copy.status == LoanStatus.MAINTENANCE.value %}
+                text-danger
+            {% else %}
+                text-warning
+            {% endif %}
+            ">
+            {{ copy.get_status_display }}
+            </p>
+            {% if copy.status != LoanStatus.AVAILABLE.value %}
+            <p><strong>{% trans "Due to be returned" %}:</strong> {{ copy.due_back }}</p>
+            {% endif %}
+            <p><strong>{% trans "Imprint" %}:</strong> {{ copy.imprint }}</p>
+            <p class="text-muted"><strong>{% trans "Id" %}:</strong> {{ copy.id }}</p>
+        {% endfor %}
+    </div>
+{% endblock %}

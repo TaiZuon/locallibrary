@@ -1,13 +1,16 @@
-from django.core.management.base import BaseCommand
-from django_seed import Seed
+'''Django management command to seed the database with test data.'''
 import random
 import uuid
-from datetime import timedelta, date
+
+from django.core.management.base import BaseCommand
+from django_seed import Seed
 
 from catalog.models import Author, Book, Genre, BookInstance
 from catalog.constants import LoanStatus
 
+
 class Command(BaseCommand):
+    """Django management command to seed the database with test data."""
     help = 'Seed database with test data'
 
     def add_arguments(self, parser):

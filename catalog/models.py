@@ -1,10 +1,12 @@
+'''catalog/models.py'''
+import uuid  # Required for unique book instances
+
 from django.db import models
 from django.urls import reverse  # Used to generate URLs by reversing the URL patterns
-import uuid  # Required for unique book instances
-from .constants import MAX_LENGTH_TITLE, MAX_LENGTH_NAME, MAX_LENGTH_SUMMARY, MAX_LENGTH_ISBN, MAX_LENGTH_IMPRINT, LoanStatus
 from django.utils.translation import gettext_lazy as _
 
-# Create your models here.
+from .constants import MAX_LENGTH_TITLE, MAX_LENGTH_NAME, MAX_LENGTH_SUMMARY, MAX_LENGTH_ISBN, MAX_LENGTH_IMPRINT, LoanStatus
+
 
 class Genre(models.Model):
     """
@@ -21,6 +23,7 @@ class Genre(models.Model):
         """
         return self.name
     
+
 class Book(models.Model):
     """
     Model representing a book (but not a specific copy of a book).
@@ -70,6 +73,7 @@ class Book(models.Model):
     
     display_genre.short_description = 'Genre' 
     
+
 class BookInstance(models.Model):
     """
     Model representing a specific copy of a book (i.e. that can be borrowed from the library).
@@ -113,6 +117,7 @@ class BookInstance(models.Model):
         String for representing the Model object.
         """
         return f'{self.id} ({self.book.title})'
+    
     
 class Author(models.Model):
     """
