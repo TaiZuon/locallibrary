@@ -1,14 +1,17 @@
 # enum class
 from enum import Enum
 
+
 class LoanStatus(Enum):
     """
     Enum representing the status of a loan.
     """
-    MAINTENANCE = 'm'
-    ON_LOAN = 'o'
-    AVAILABLE = 'a'
-    RESERVED = 'r'
+
+    MAINTENANCE = "m"
+    ON_LOAN = "o"
+    AVAILABLE = "a"
+    RESERVED = "r"
+
 
 # Maximum lengths for CharFields
 MAX_LENGTH_TITLE = 200
