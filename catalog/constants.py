@@ -22,3 +22,7 @@ MAX_LENGTH_IMPRINT = 200
 
 # Pagination settings
 BOOKS_PER_PAGE = 5
+
+# Number of weeks for book renewal
+DEFAULT_RENEWAL_WEEKS = 3
+MAX_RENEWAL_WEEKS = 4

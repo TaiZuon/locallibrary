@@ -4,7 +4,13 @@
 {% block content %}
     <h1>{% trans "Title" %}: {{ book.title }}</h1>
 
-    <p><strong>{% trans "Author" %}:</strong> <a href="">{{ book.author }}</a></p>
+    <p><strong>{% trans "Author" %}:</strong>
+    {% if book.author %}
+        <a href="{% url 'author-detail' book.author.pk %}">{{ book.author }}</a>
+    {% else %}
+        <span class="text-muted">{% trans "Unknown" %}</span>
+    {% endif %}
+    </p>
     <p><strong>{% trans "Summary" %}:</strong> {{ book.summary }}</p>
     <p><strong>{% trans "ISBN" %}:</strong> {{ book.isbn }}</p>
     <p><strong>{% trans "Language" %}:</strong> {{ book.language }}</p>

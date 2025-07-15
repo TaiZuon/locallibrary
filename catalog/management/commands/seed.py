@@ -4,6 +4,7 @@ import random
 import uuid
 
 from django.core.management.base import BaseCommand
+from django.contrib.auth.models import User
 from django_seed import Seed
 
 from catalog.models import Author, Book, Genre, BookInstance
@@ -65,6 +66,18 @@ class Command(BaseCommand):
         inserted_pks = seeder.execute()
         authors = Author.objects.all()
 
+        # Get existing users or create some test users
+        users = list(User.objects.all())
+        if users.__len__() <= 5:
+            # Create some test users if none exist
+            for i in range(5):
+                user = User.objects.create_user(
+                    username=f"testuser{i+1}",
+                    email=f"testuser{i+1}@example.com",
+                    password="testpass123",
+                )
+                users.append(user)
+
         # Seed books manually to set M2M and FK
         books = []
         for _ in range(20):
@@ -81,16 +94,25 @@ class Command(BaseCommand):
         # Seed book instances
         for book in books:
             for _ in range(random.randint(1, 5)):  # 1–5 copies
+                status = random.choice([status.value for status in LoanStatus])
+
+                # Only assign borrower if the book is on loan
+                borrower = None
+                due_back = None
+
+                if status == LoanStatus.ON_LOAN.value:
+                    borrower = random.choice(users)
+                    due_back = seeder.faker.date_between(
+                        start_date="today", end_date="+30d"
+                    )
+
                 BookInstance.objects.create(
                     id=uuid.uuid4(),
                     book=book,
                     imprint=seeder.faker.company(),
-                    due_back=seeder.faker.date_between(
-                        start_date="today", end_date="+30d"
-                    ),
-                    status=random.choice(
-                        [status.value for status in LoanStatus]
-                    ),
+                    due_back=due_back,
+                    borrower=borrower,
+                    status=status,
                 )
 
         self.stdout.write(

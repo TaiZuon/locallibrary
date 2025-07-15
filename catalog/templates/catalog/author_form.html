@@ -1,0 +1,13 @@
+{% extends "base_generic.html" %}
+{% load i18n %}
+
+{% block content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        <table>
+            {{ form.as_table }}
+        </table>
+        <button type="submit">{% trans "Submit" %}</button>
+        <a href="{% url 'authors' %}" class="button">{% trans "Cancel" %}</a>
+    </form>
+{% endblock %}

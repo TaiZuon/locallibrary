@@ -22,3 +22,35 @@ urlpatterns += [
         name="mark-returned",
     ),
 ]
+
+urlpatterns += [
+    path(
+        "books/<uuid:pk>/renew/",
+        views.renew_book_librarian,
+        name="renew-book-librarian",
+    ),
+]
+
+urlpatterns += [
+    path("authors/", views.AuthorListView.as_view(), name="authors"),
+    path(
+        "authors/<int:pk>/",
+        views.AuthorDetailView.as_view(),
+        name="author-detail",
+    ),
+    path(
+        "authors/create/",
+        views.AuthorCreateView.as_view(),
+        name="author-create",
+    ),
+    path(
+        "authors/<int:pk>/update/",
+        views.AuthorUpdateView.as_view(),
+        name="author-update",
+    ),
+    path(
+        "authors/<int:pk>/delete/",
+        views.AuthorDeleteView.as_view(),
+        name="author-delete",
+    ),
+]
