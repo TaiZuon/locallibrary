@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView
@@ -22,7 +23,13 @@ from django.conf.urls.static import static
 from . import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('catalog/', include('catalog.urls')),  
-    path('', RedirectView.as_view(url='catalog/')),  
+    path("admin/", admin.site.urls),
+    path("catalog/", include("catalog.urls")),
+    path("", RedirectView.as_view(url="catalog/")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# add Django site authentication urls (for login, logout, password management)
+
+urlpatterns += [
+    path("accounts/", include("django.contrib.auth.urls")),
+]

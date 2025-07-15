@@ -15,9 +15,9 @@
         {% for copy in book_instances %}
             <hr>
             <p class="
-            {% if copy.status == LoanStatus.AVAILABLE.value %}
+            {% if copy.status == AVAILABLE %}
                 text-success
-            {% elif copy.status == LoanStatus.MAINTENANCE.value %}
+            {% elif copy.status == MAINTENANCE %}
                 text-danger
             {% else %}
                 text-warning
@@ -25,11 +25,16 @@
             ">
             {{ copy.get_status_display }}
             </p>
-            {% if copy.status != LoanStatus.AVAILABLE.value %}
+            {% if copy.status != AVAILABLE %}
             <p><strong>{% trans "Due to be returned" %}:</strong> {{ copy.due_back }}</p>
             {% endif %}
             <p><strong>{% trans "Imprint" %}:</strong> {{ copy.imprint }}</p>
             <p class="text-muted"><strong>{% trans "Id" %}:</strong> {{ copy.id }}</p>
+            {% if copy.status == ON_LOAN and can_mark_returned %}
+                <a href="{% url 'mark-returned' copy.id %}" class="btn btn-primary btn-sm">
+                    {%trans "Mark as Returned" %}
+                </a>
+            {% endif %}
         {% endfor %}
     </div>
 {% endblock %}

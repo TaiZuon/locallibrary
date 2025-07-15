@@ -23,8 +23,28 @@
                 <ul class="sidebar-nav">
                     <li><a href="{% url 'index' %}">{% trans "Home" %}</a></li>
                     <li><a href="{% url 'books' %}">{% trans "All books" %}</a></li>
-                    <li><a href="">{% trans "All authors" %}</a></li>                                                                                                         
-                </ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+                    <li><a href="">{% trans "All authors" %}</a></li>                                                                                                           
+                {% if user.is_authenticated %}
+                    <li>
+                        {% trans "User" %}: {{ user.username }}
+                    </li>
+                    <li>
+                        <a href="{% url 'my-borrowed' %}">{% trans "My Borrowed" %}</a>
+                    </li>
+                    <li>
+                        <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" style="all: unset; cursor: pointer; color: blue; text-decoration: underline;">
+                                {% trans "Logout" %}
+                            </button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="{% url 'login' %}?next={{ request.path }}">{% trans "Login" %}</a>
+                    </li>
+                {% endif %}
+                </ul>
                 {% endblock %}
             </div>
             <div class="col-sm-10">

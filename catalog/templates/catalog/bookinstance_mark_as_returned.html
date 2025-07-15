@@ -1,0 +1,20 @@
+{% extends "base_generic.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h1>{% trans "Confirm Return" %}</h1>
+
+  <p>{% trans "Are you sure you want to mark the following book as returned?" %}</p>
+
+  <ul>
+    <li><strong>{% trans "Book" %}:</strong> {{ bookinstance.book.title }}</li>
+    <li><strong>{% trans "Borrower" %}:</strong> {{ bookinstance.borrower }}</li>
+    <li><strong>{% trans "Due back" %}:</strong> {{ bookinstance.due_back }}</li>
+  </ul>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success">{% trans "Confirm" %}</button>
+    <a href="{% url 'book-detail' bookinstance.book.pk %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+  </form>
+{% endblock %}

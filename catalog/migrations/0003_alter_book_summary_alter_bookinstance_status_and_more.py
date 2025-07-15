@@ -6,23 +6,40 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('catalog', '0002_rename_gerne_genre'),
+        ("catalog", "0002_rename_gerne_genre"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='book',
-            name='summary',
-            field=models.TextField(help_text='Enter a brief description of the book', max_length=100),
+            model_name="book",
+            name="summary",
+            field=models.TextField(
+                help_text="Enter a brief description of the book",
+                max_length=100,
+            ),
         ),
         migrations.AlterField(
-            model_name='bookinstance',
-            name='status',
-            field=models.CharField(blank=True, choices=[('m', 'Maintenance'), ('o', 'On_loan'), ('a', 'Available'), ('r', 'Reserved')], default='m', help_text='Book availability', max_length=1),
+            model_name="bookinstance",
+            name="status",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("m", "Maintenance"),
+                    ("o", "On_loan"),
+                    ("a", "Available"),
+                    ("r", "Reserved"),
+                ],
+                default="m",
+                help_text="Book availability",
+                max_length=1,
+            ),
         ),
         migrations.AlterField(
-            model_name='genre',
-            name='name',
-            field=models.CharField(help_text='Enter a book genre (e.g. Science Fiction)', max_length=100),
+            model_name="genre",
+            name="name",
+            field=models.CharField(
+                help_text="Enter a book genre (e.g. Science Fiction)",
+                max_length=100,
+            ),
         ),
     ]

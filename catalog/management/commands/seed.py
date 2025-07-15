@@ -1,4 +1,5 @@
-'''Django management command to seed the database with test data.'''
+"""Django management command to seed the database with test data."""
+
 import random
 import uuid
 
@@ -11,19 +12,22 @@ from catalog.constants import LoanStatus
 
 class Command(BaseCommand):
     """Django management command to seed the database with test data."""
-    help = 'Seed database with test data'
+
+    help = "Seed database with test data"
 
     def add_arguments(self, parser):
-        parser.add_argument('--clear', action='store_true', help='Delete all seeded data')
+        parser.add_argument(
+            "--clear", action="store_true", help="Delete all seeded data"
+        )
 
     def handle(self, *args, **kwargs):
-        if kwargs['clear']:
-            self.stdout.write('🧹 Clearing seeded data...')
+        if kwargs["clear"]:
+            self.stdout.write("🧹 Clearing seeded data...")
             BookInstance.objects.all().delete()
             Book.objects.all().delete()
             Author.objects.all().delete()
             Genre.objects.all().delete()
-            self.stdout.write(self.style.SUCCESS('✅ All seeded data deleted.'))
+            self.stdout.write(self.style.SUCCESS("✅ All seeded data deleted."))
             return
 
         seeder = Seed.seeder()
@@ -35,16 +39,28 @@ class Command(BaseCommand):
         BookInstance.objects.all().delete()
 
         # Seed genres
-        genre_names = ['Science Fiction', 'Fantasy', 'Mystery', 'Romance', 'Non-Fiction']
+        genre_names = [
+            "Science Fiction",
+            "Fantasy",
+            "Mystery",
+            "Romance",
+            "Non-Fiction",
+        ]
         genres = [Genre.objects.create(name=name) for name in genre_names]
 
         # Seed authors
-        seeder.add_entity(Author, 10, {
-            'first_name': lambda x: seeder.faker.first_name(),
-            'last_name': lambda x: seeder.faker.last_name(),
-            'date_of_birth': lambda x: seeder.faker.date_of_birth(minimum_age=30, maximum_age=80),
-            'date_of_death': lambda x: None
-        })
+        seeder.add_entity(
+            Author,
+            10,
+            {
+                "first_name": lambda x: seeder.faker.first_name(),
+                "last_name": lambda x: seeder.faker.last_name(),
+                "date_of_birth": lambda x: seeder.faker.date_of_birth(
+                    minimum_age=30, maximum_age=80
+                ),
+                "date_of_death": lambda x: None,
+            },
+        )
 
         inserted_pks = seeder.execute()
         authors = Author.objects.all()
@@ -69,8 +85,14 @@ class Command(BaseCommand):
                     id=uuid.uuid4(),
                     book=book,
                     imprint=seeder.faker.company(),
-                    due_back=seeder.faker.date_between(start_date='today', end_date='+30d'),
-                    status=random.choice([status.value for status in LoanStatus])
+                    due_back=seeder.faker.date_between(
+                        start_date="today", end_date="+30d"
+                    ),
+                    status=random.choice(
+                        [status.value for status in LoanStatus]
+                    ),
                 )
 
-        self.stdout.write(self.style.SUCCESS('🎉 Database seeded successfully!'))
+        self.stdout.write(
+            self.style.SUCCESS("🎉 Database seeded successfully!")
+        )
