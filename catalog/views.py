@@ -4,7 +4,10 @@ import datetime
 from urllib import request
 
 from django.shortcuts import redirect, render, get_object_or_404
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import (
+    PermissionRequiredMixin,
+    LoginRequiredMixin,
+)
 from django.contrib.auth.decorators import permission_required, login_required
 from django.views import generic, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -87,7 +90,7 @@ class BookDetailView(generic.DetailView):
         )
 
 
-class LoanedBooksByUserListView(generic.ListView):
+class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
     """
     Generic class-based view for a list of books on loan to the current user.
     """
@@ -150,7 +153,7 @@ def renew_book_librarian(request, pk):
             # Process the renewal
             book_instance.due_back = form.cleaned_data["renewal_date"]
             book_instance.save()
-            return redirect("book-detail", pk=book_instance.book.pk)
+            return redirect("my-borrowed")
     else:
         # Display the form with the current due date
         proposed_renewal_date = datetime.date.today() + datetime.timedelta(
