@@ -1,0 +1,20 @@
+{% extends "base_generic.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h1>{% trans "Author List" %}</h1>
+    {% if can_add_author %}
+        <a href="{% url 'author-create' %}" class="btn btn-primary">{% trans "Create Author" %}</a>
+    {% endif %}
+    <ul>
+        {% for author in author_list %}
+            <li>
+                <a href="{% url 'author-detail' author.id %}">
+                    {{ author.first_name }} {{ author.last_name }}
+                </a>
+            </li>
+        {% empty %}
+            <li>{% trans "No authors available." %}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

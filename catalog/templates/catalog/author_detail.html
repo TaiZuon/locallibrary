@@ -1,0 +1,35 @@
+{% extends 'base_generic.html' %}
+{% load i18n %}
+
+{% block content %}
+    <h1>{{ author.first_name }} {{ author.last_name }}</h1>
+    <p><strong>{% trans "Date of birth" %}:</strong> 
+        {{ author.date_of_birth }}
+    </p>
+    {% if author.date_of_death %}
+        <p><strong>{% trans "Date of death" %}:</strong> 
+            {{ author.date_of_death }}
+        </p>
+    {% endif %}
+
+    {% if can_update_author %}
+        <a href="{% url 'author-update' author.pk %}" class="btn btn-primary">
+            {% trans "Update Author" %}
+        </a>
+    {% endif %}
+    {% if can_delete_author %}
+        <a href="{% url 'author-delete' author.pk %}" class="btn btn-danger">
+            {% trans "Delete Author" %}
+        </a>
+    {% endif %}
+    <h2>{% trans "Books by this author" %}</h2>
+    <ul>
+        {% for book in book_set %}
+            <li>
+                <a href="{% url 'book-detail' book.pk %}">{{ book.title }}</a>
+            </li>
+        {% empty %}
+            <li>{% trans "No books available." %}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

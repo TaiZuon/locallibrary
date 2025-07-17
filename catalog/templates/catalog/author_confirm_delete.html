@@ -1,0 +1,16 @@
+{% extends "base_generic.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h1>{% trans "Delete Author" %}</h1>
+    <p>
+        {% blocktrans with author=author %}
+            Are you sure you want to delete the author: {{ author }}?
+        {% endblocktrans %}
+    </p>
+    <form action="" method="POST" style="display:inline;">
+        {% csrf_token %}
+        <input type="submit" value="{% trans 'Yes, delete.' %}">
+    </form>
+    <a href="{% url 'author-detail' author.pk %}" class="button">{% trans "Cancel" %}</a>
+{% endblock %}

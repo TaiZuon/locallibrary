@@ -1,15 +1,18 @@
 """catalog/views.py"""
 
+import datetime
 from urllib import request
 
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.decorators import permission_required, login_required
 from django.views import generic, View
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
 
 from catalog.models import Book, Author, BookInstance
-from catalog.constants import LoanStatus
-
-from .constants import BOOKS_PER_PAGE
+from catalog.constants import LoanStatus, BOOKS_PER_PAGE, DEFAULT_RENEWAL_WEEKS
+from catalog.forms import RenewBookForm
 
 
 def index(request):
@@ -91,7 +94,7 @@ class LoanedBooksByUserListView(generic.ListView):
 
     model = BookInstance
     template_name = "catalog/bookinstance_list_borrowed_user.html"
-    paginate_by = 5
+    paginate_by = BOOKS_PER_PAGE
 
     def get_queryset(self):
         """Return the books on loan to the current user."""
@@ -100,6 +103,12 @@ class LoanedBooksByUserListView(generic.ListView):
             .filter(status__exact=LoanStatus.ON_LOAN.value)
             .order_by("due_back")
         )
+
+    def get_context_data(self, **kwargs):
+        """Add additional context data to the view."""
+        context = super().get_context_data(**kwargs)
+        context["can_renew"] = self.request.user.has_perm("catalog.can_renew")
+        return context
 
 
 class MarkBookAsReturnedView(PermissionRequiredMixin, View):
@@ -127,3 +136,106 @@ class MarkBookAsReturnedView(PermissionRequiredMixin, View):
 
         # Redirect to the book detail page after returning
         return redirect("book-detail", pk=book_instance.book.pk)
+
+
+@login_required
+@permission_required("catalog.can_renew", raise_exception=True)
+def renew_book_librarian(request, pk):
+    """View function for renewing a book instance by a librarian."""
+    book_instance = get_object_or_404(BookInstance, pk=pk)
+
+    if request.method == "POST":
+        form = RenewBookForm(request.POST)
+        if form.is_valid():
+            # Process the renewal
+            book_instance.due_back = form.cleaned_data["renewal_date"]
+            book_instance.save()
+            return redirect("book-detail", pk=book_instance.book.pk)
+    else:
+        # Display the form with the current due date
+        proposed_renewal_date = datetime.date.today() + datetime.timedelta(
+            weeks=DEFAULT_RENEWAL_WEEKS
+        )
+        form = RenewBookForm(initial={"renewal_date": proposed_renewal_date})
+
+    context = {
+        "form": form,
+        "book_instance": book_instance,
+    }
+
+    return render(
+        request,
+        "catalog/book_renew_librarian.html",
+        context,
+    )
+
+
+class AuthorListView(generic.ListView):
+    """Generic class-based view for a list of authors."""
+
+    model = Author
+    paginate_by = BOOKS_PER_PAGE
+    context_object_name = "author_list"
+    template_name = "catalog/author_list.html"
+    queryset = Author.objects.all().order_by("last_name", "first_name")
+
+    def get_context_data(self, **kwargs):
+        """Add additional context data to the view."""
+        context = super(AuthorListView, self).get_context_data(**kwargs)
+        context["can_add_author"] = self.request.user.has_perm(
+            "catalog.can_add_author"
+        )
+        return context
+
+
+class AuthorDetailView(generic.DetailView):
+    """Generic class-based view for an author detail page."""
+
+    model = Author
+
+    def get_context_data(self, **kwargs):
+        """Add additional context data to the view."""
+        context = super(AuthorDetailView, self).get_context_data(**kwargs)
+        context["book_set"] = Book.objects.filter(author=self.object).order_by(
+            "title"
+        )
+        context["can_update_author"] = self.request.user.has_perm(
+            "catalog.change_author"
+        )
+        context["can_delete_author"] = self.request.user.has_perm(
+            "catalog.delete_author"
+        )
+        return context
+
+
+class AuthorCreateView(PermissionRequiredMixin, CreateView):
+    """Generic class-based view for creating a new author."""
+
+    permission_required = "catalog.add_author"
+
+    model = Author
+    fields = ["first_name", "last_name", "date_of_birth", "date_of_death"]
+    initial = {
+        "date_of_death": None,
+    }
+
+
+class AuthorUpdateView(PermissionRequiredMixin, UpdateView):
+    """Generic class-based view for updating an existing author."""
+
+    permission_required = "catalog.change_author"
+
+    model = Author
+    fields = ["first_name", "last_name", "date_of_birth", "date_of_death"]
+
+    def get_success_url(self):
+        return reverse_lazy("author-detail", kwargs={"pk": self.object.pk})
+
+
+class AuthorDeleteView(PermissionRequiredMixin, DeleteView):
+    """Generic class-based view for deleting an author."""
+
+    permission_required = "catalog.delete_author"
+
+    model = Author
+    success_url = reverse_lazy("authors")
